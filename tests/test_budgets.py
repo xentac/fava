@@ -72,3 +72,34 @@ def test_budgets_dateline_yearly():
     assert budgets.budget('Expenses:Books', date(2011, 2, 1), date(2011, 2, 2))['EUR'] == BUDGET / number_of_days_in_period('yearly', date(2011, 2, 1))  # noqa
     assert budgets.budget('Expenses:Books', date(2015, 5, 30), date(2015, 5, 31))['EUR'] == BUDGET / number_of_days_in_period('yearly', date(2015, 5, 30))  # noqa
     assert budgets.budget('Expenses:Books', date(2016, 8, 15), date(2016, 8, 16))['EUR'] == BUDGET / number_of_days_in_period('yearly', date(2016, 8, 15))  # noqa
+
+
+def test_budgets_dateline_multiple_currencies():
+    BUDGET = Decimal(99999.87)
+    budgets = get_budgets("""
+        2010-01-01 custom "budget" Expenses:Books "yearly"  {budget} EUR
+        2010-01-01 custom "budget" Expenses:Books "yearly"  {budget} USD
+    """.format(budget=BUDGET))
+
+    assert budgets.budget('Expenses:Books', date(2011, 2, 1), date(2011, 2, 2))['EUR'] == BUDGET / number_of_days_in_period('yearly', date(2011, 2, 1))  # noqa
+    assert budgets.budget('Expenses:Books', date(2011, 2, 1), date(2011, 2, 2))['USD'] == BUDGET / number_of_days_in_period('yearly', date(2011, 2, 1))  # noqa
+
+
+def test_budgets_chart_budgets():
+    BUDGET = Decimal(2.5)
+    budgets = get_budgets("""
+        2016-05-01 custom "budget" Expenses:Books "daily"    {budget} EUR
+        2016-06-01 custom "budget" Expenses:Books "daily"    {budget} EUR
+        2016-07-01 custom "budget" Expenses:Books "daily"    {budget} EUR
+        2016-07-01 custom "budget" Expenses:Books "monthly"  {budget} USD
+    """.format(budget=BUDGET))
+
+    chart_budgets = budgets.chart_budgets('Expenses:Books', date(2016, 4, 1), date(2016, 8, 30), 'month')  # noqa
+
+    assert len(chart_budgets) == 2
+    assert len(chart_budgets['EUR']) == 4
+    assert chart_budgets['EUR'][0] == (date(2016, 5, 1), Decimal('77.5'))
+    assert chart_budgets['EUR'][1] == (date(2016, 6, 1), Decimal('75.0'))
+    assert chart_budgets['EUR'][3] == (date(2016, 8, 1), Decimal('77.5'))
+    assert len(chart_budgets['USD']) == 2
+    assert chart_budgets['USD'][0] == (date(2016, 7, 1), Decimal('2.499999999999999999999999994'))
