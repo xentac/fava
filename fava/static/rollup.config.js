@@ -1,5 +1,5 @@
 import commonjs from "rollup-plugin-commonjs";
-import css from "rollup-plugin-css-only";
+import css from "rollup-plugin-css-bundle";
 import nodeResolve from "rollup-plugin-node-resolve";
 import svelte from "rollup-plugin-svelte";
 import typescript from "rollup-plugin-typescript";

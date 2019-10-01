@@ -127,7 +127,7 @@
     "prettier-plugin-svelte": "^0.7.0",
     "rollup": "^1.22.0",
     "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-css-only": "^1.0.0",
+    "rollup-plugin-css-bundle": "^1.0.4",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-svelte": "^5.1.0",
     "rollup-plugin-typescript": "^1.0.1",
